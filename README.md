@@ -1,4 +1,4 @@
-# Chess Engine with Pythin
+# Chess Engine with Python
 
 A fully functional chess game built with Python and Pygame, featuring a complete rule implementation including special moves like en passant and pawn promotion.
 
