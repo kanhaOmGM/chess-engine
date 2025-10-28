@@ -1,178 +1,268 @@
+<<<<<<< HEAD
+# Chess Engine
+=======
 # Chess Engine with Python
+>>>>>>> 6efb2388acab281f693b091b9c7d6242b0694a99
 
-A fully functional chess game built with Python and Pygame, featuring a complete rule implementation including special moves like en passant and pawn promotion.
+## Introduction
+
+Chess has been a significant part of my life for the past few years. As a programmer, I've always been curious about how chess engines work—from the AI decision-making to the UI mechanics that validate legal moves at every step. The intricate rules like en passant, castling, and checkmate detection fascinated me, and I wanted to understand them by building my own implementation.
+
+This project is the result of that curiosity and dedication. It's a working chess engine with a graphical interface, move validation, and an AI opponent that uses minimax search with alpha-beta pruning. While it's not perfect, it represents my learning journey in both chess and algorithms.
+
+I'm sharing this on GitHub to document my progress and to learn from the community. I hope to continue improving this engine as I deepen my understanding of chess programming.
+
+---
 
 ## Features
 
-- **Full Chess Rules Implementation**
-  - All piece movements (Pawns, Rooks, Knights, Bishops, Queens, Kings)
-  - Pawn promotion with GUI selection
+- **Playable Chess Game**: Full chess implementation with all standard rules
+- **AI Opponent**: Minimax algorithm with alpha-beta pruning (configurable depth)
+- **Opening Book**: Uses polyglot opening book for early game moves
+- **Move Validation**: Complete legal move generation including:
   - En passant captures
+  - Castling (kingside and queenside)
+  - Pawn promotion
   - Check and checkmate detection
-  - Stalemate detection
-  - Legal move validation
+- **Graphical Interface**: Pygame-based UI with:
+  - Move highlighting
+  - Smooth piece animations
+  - Interactive piece selection
+  - Visual feedback for legal moves
 
-- **Interactive GUI**
-  - Click-to-move interface
-  - Visual board with alternating colors
-  - Piece sprites for all chess pieces
-  - Promotion piece selection dialog
+---
 
-## Prerequisites
+## Files Overview
 
-- Python 3.7 or higher
-- Pygame library
+### `chess_engine.py`
+The core game logic implementing all chess rules.
 
-## Installation
+**Key Components:**
+- `GameState`: Manages the board state, move history, and game status
+  - 8×8 board representation using 2-character strings (color + piece type)
+  - King position tracking for efficient check detection
+  - Castling rights management
+  - En passant tracking
+  
+- `Move`: Represents individual moves with chess notation support
+  - Converts between array indices and algebraic notation
+  - Handles special moves (castling, en passant, promotion)
+  
+- `Castle_R`: Stores castling rights for both players
 
-1. Clone or download this repository
+**Core Methods:**
+- `make_move()` / `undo()`: Execute and reverse moves
+- `get_valid_moves()`: Generates all legal moves (filters out moves that leave king in check)
+- `all_possible_moves()`: Generates pseudo-legal moves for each piece type
+- `check()` / `square_under_att()`: Detects checks and attacked squares
+- Piece-specific move generators: `get_pawn_moves()`, `get_knight_moves()`, etc.
 
-2. Install Pygame:
+---
+
+### `Engine_Move.py`
+The AI engine that selects moves using minimax search.
+
+**Key Features:**
+
+**Piece Values:**
+```python
+piece_value = {"k": 0, "q": 10, "r": 5, "b": 3.2, "n": 3, "p": 1}
+```
+
+**Search Algorithm:**
+- `find_best_move()`: Entry point for AI move selection
+  - Checks opening book for early game
+  - Uses minimax with alpha-beta pruning
+  - Returns best move based on evaluation
+  
+- `minimax()`: Recursive search function
+  - Alpha-beta pruning for efficient tree exploration
+  - Configurable depth (default: 3)
+  - Move ordering for better pruning efficiency
+
+**Evaluation Functions:**
+- `material_score()`: Calculates piece material advantage
+- `evaluate_position()`: Positional evaluation including:
+  - Pawn advancement bonuses
+  - Center control (d4, e4, d5, e5)
+  - Piece development (knights and bishops)
+  
+- `evaluate_endgame()`: Endgame-specific evaluation
+  - King centralization
+  - Pawn structure (penalizes doubled/isolated pawns)
+  - Triggered when queens are traded or few major pieces remain
+
+**Optimizations:**
+- Transposition table (basic implementation)
+- Move ordering: prioritizes captures and attacks
+- Opening book integration
+
+---
+
+### `main.py`
+The graphical interface and game loop using Pygame.
+
+**UI Components:**
+- Board rendering with alternating square colors
+- Piece sprites loaded from image files
+- Move animations with smooth interpolation
+- Square highlighting for selected pieces and legal moves
+
+**Key Functions:**
+- `load_images()`: Loads piece sprites
+- `draw_board()` / `draw_pieces()`: Renders the board and pieces
+- `animate_move()`: Smooth piece movement animation
+- `highlight()`: Visual feedback for selected squares and legal moves
+- `choose_promotion()`: Interactive pawn promotion selection
+
+**Game Loop:**
+- Handles player input (mouse clicks)
+- Manages turn-based play (human vs AI)
+- Validates moves against legal move list
+- Triggers AI move calculation on engine's turn
+- Updates display at 60 FPS for smooth animations
+
+**Configuration:**
+- Board size: 480×480 pixels (60×60 per square)
+- Player colors: Set `player_one` and `player_two` (True = human, False = AI)
+- AI depth: Configurable in the engine move call
+
+---
+
+## How It Works
+
+### Game Flow
+1. Board is initialized in starting position
+2. Player selects a piece (blue border shows selection)
+3. Legal moves are highlighted with gray overlays
+4. Player clicks destination square
+5. Move is validated and animated
+6. Board state updates (check/checkmate detection, castling rights, etc.)
+7. AI calculates response using minimax
+8. AI move is animated and executed
+9. Loop continues until checkmate or stalemate
+
+### AI Decision Making
+1. Check opening book for known positions (first 20 moves)
+2. If no book move, run minimax search to configured depth
+3. For each legal move:
+   - Make move on temporary board state
+   - Recursively evaluate resulting positions
+   - Alpha-beta pruning eliminates inferior branches
+4. Select move with best evaluation score
+5. Fallback to random valid move if search fails
+
+### Move Validation
+All moves go through legality checking:
+1. Generate pseudo-legal moves (piece movement rules only)
+2. For each move, temporarily execute it
+3. Check if king is in check after the move
+4. If king is safe, add to valid moves list
+5. Detect checkmate (in check with no valid moves) or stalemate (no valid moves, not in check)
+
+---
+
+## Installation & Usage
+
+### Requirements
 ```bash
 pip install pygame
 ```
 
-3. Ensure your directory structure looks like this:
-```
-chess-engine/
-├── main.py
-├── chess_engine.py
-└── pieces/
-    └── bases/
-        ├── wp.png
-        ├── wr.png
-        ├── wn.png
-        ├── wb.png
-        ├── wq.png
-        ├── wk.png
-        ├── bp.png
-        ├── br.png
-        ├── bn.png
-        ├── bb.png
-        ├── bq.png
-        └── bk.png
-```
-
-## Usage
-
-Run the game with:
+### Running the Game
 ```bash
 python main.py
 ```
 
-### How to Play
+### Configuration
+Edit `main.py` to configure:
+- **Player types**: Set `player_one = True` (human) or `False` (AI)
+- **AI difficulty**: Adjust `depth` parameter in AI move call (higher = stronger but slower)
+- **Piece images path**: Update path in `load_images()` to match your directory structure
 
-1. **Making Moves**: Click on a piece to select it, then click on a valid destination square
-2. **Deselecting**: Click on the same piece again to deselect it
-3. **Pawn Promotion**: When a pawn reaches the opposite end, a dialog will appear allowing you to choose the promotion piece (Queen, Rook, Bishop, or Knight)
-4. **Game End**: The game detects checkmate and stalemate automatically
+---
 
-### Controls
+## Known Limitations & Future Improvements
 
-- **Mouse Click**: Select and move pieces
-- **Close Window**: Exit the game
+### Current Limitations
+- Basic evaluation function (doesn't consider complex positional factors)
+- Simple transposition table implementation
+- No iterative deepening (fixed depth search)
+- Move ordering could be more sophisticated
+- No endgame tablebases
 
-## Game Rules Implemented
+### Planned Improvements
+- **Better Evaluation**: 
+  - Piece-square tables for positional evaluation
+  - King safety metrics
+  - Mobility and threat evaluation
+  - Pawn structure analysis
+  
+- **Search Enhancements**:
+  - Iterative deepening with time management
+  - Quiescence search for tactical positions
+  - Better move ordering (MVV-LVA, killer moves, history heuristic)
+  - Proper transposition table with Zobrist hashing
+  
+- **UI Improvements**:
+  - Move history display
+  - Game save/load functionality
+  - Position analysis features
+  - Multiple board themes
 
-### Standard Moves
-- **Pawns**: Move forward one square (or two from starting position), capture diagonally
-- **Rooks**: Move horizontally or vertically any number of squares
-- **Knights**: Move in an L-shape (2+1 squares)
-- **Bishops**: Move diagonally any number of squares
-- **Queens**: Combine rook and bishop movements
-- **Kings**: Move one square in any direction
+- **Code Quality**:
+  - Better documentation
+  - Unit tests for move generation
+  - Performance profiling and optimization
 
-### Special Moves
-- **En Passant**: Capture an enemy pawn that just moved two squares forward, as if it had only moved one
-- **Pawn Promotion**: When a pawn reaches the opposite end of the board, it must be promoted to a Queen, Rook, Bishop, or Knight
+---
 
-### Game End Conditions
-- **Checkmate**: When a king is in check and has no legal moves to escape
-- **Stalemate**: When a player has no legal moves but is not in check (draw)
+## Technical Notes
 
-## Code Structure
+### Board Representation
+- Array-based: `board[row][col]` where (0,0) is a8, (7,7) is h1
+- Pieces stored as 2-char strings: first char = color ('w'/'b'), second char = type ('p','n','b','r','q','k')
+- Empty squares: `"--"`
 
-### `main.py`
-Contains the game loop and GUI rendering:
-- `load_images()`: Loads all chess piece sprites
-- `draw_board()`: Renders the chess board
-- `draw_pieces()`: Renders all pieces on the board
-- `choose_promotion()`: Displays promotion selection dialog
-- `main()`: Main game loop handling user input and game state
+### Coordinate System
+- Rows: 0-7 (rank 8 to rank 1)
+- Columns: 0-7 (files a to h)
+- Conversion handled by `Move` class dictionaries
 
-### `chess_engine.py`
-Contains the game logic:
-- **`GameState` class**: Manages the board state, move validation, and game rules
-  - `make_move()`: Executes a move and updates the board
-  - `undo()`: Reverts the last move
-  - `get_valid_moves()`: Returns all legal moves for the current player
-  - `check()`: Determines if the current player is in check
-  - `get_*_moves()`: Individual move generation for each piece type
+### Special Moves Implementation
+- **En Passant**: Tracked via `enpassant_possible` tuple storing target square
+- **Castling**: Rights stored in `Castle_R` object, validated by checking squares and attack status
+- **Promotion**: Detected when pawn reaches opposite back rank, UI prompts for piece selection
 
-- **`Move` class**: Represents a chess move
-  - Handles move notation (algebraic notation)
-  - Tracks special move types (en passant, promotion)
+---
 
-## Chess Notation
+## Learning Resources
 
-The game prints moves in algebraic notation:
-- Piece moves: `Nf3`, `Bb5`, `Qd4`
-- Captures: `Nxe5`, `Bxc6`, `exd5`
-- Pawn moves: `e4`, `d5`
-- Pawn captures: `exd5`, `cxd4`
+This project was inspired by and learned from various chess programming resources:
+- Sebastian Lague's chess challenge
+- Chess programming wikis and forums
+- Various open-source chess engines
 
-## Customization
+---
 
-### Board Colors
-Edit the `draw_board()` function in `main.py`:
-```python
-colors = [p.Color("white"), p.Color("brown")]
-```
+## Contributing
 
-### Board Size
-Modify at the top of `main.py`:
-```python
-width = height = 480  # Change to desired size
-```
+This is a learning project, and I welcome feedback, suggestions, and contributions! Feel free to:
+- Open issues for bugs or feature requests
+- Submit pull requests with improvements
+- Share educational resources about chess programming
+- Suggest better approaches to evaluation or search
 
-### Frame Rate
-Adjust the FPS:
-```python
-max_fps = 15  # Increase for smoother animation
-```
-
-## Known Limitations
-
-- No castling implementation
-- No move timer
-- No AI opponent (two-player only)
-- No move history display
-- No game save/load functionality
-
-## Future Enhancements
-
-- [ ] Add castling (kingside and queenside)
-- [ ] Implement undo functionality with keyboard shortcut
-- [ ] Add move highlighting for selected pieces
-- [ ] Display captured pieces
-- [ ] Add game timer/clock
-- [ ] Implement basic AI opponent
-- [ ] Add move sound effects
-- [ ] Save/load game functionality
-- [ ] Move history panel
-
-## Troubleshooting
-
-**Images not loading**: Ensure the piece images are in the correct directory (`chess-engine/pieces/bases/`) with the correct naming convention (e.g., `wp.png` for white pawn)
-
-**Pygame not found**: Install pygame using `pip install pygame`
-
-**Game crashes on promotion**: Ensure all piece images (q, r, b, n) exist for both colors
-
-## Credits
-
-Built with Python and Pygame. Chess piece images should be placed in the appropriate directory structure.
+---
 
 ## License
 
-Free to use and modify for personal and educational purposes.
+MIT License
+
+---
+
+## Acknowledgments
+
+- Sebastian Lague for inspiring efficient storage and search techniques
+- The chess programming community for extensive documentation and resources
+- Polyglot opening book format and contributors
