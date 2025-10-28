@@ -1,8 +1,8 @@
-<<<<<<< HEAD
+
 # Chess Engine
-=======
+
 # Chess Engine with Python
->>>>>>> 6efb2388acab281f693b091b9c7d6242b0694a99
+
 
 ## Introduction
 
