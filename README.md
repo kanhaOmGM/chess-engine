@@ -1,6 +1,4 @@
 
-# Chess Engine
-
 # Chess Engine with Python
 
 
