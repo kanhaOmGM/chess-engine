@@ -226,7 +226,7 @@ def main():
                 gs.make_move(ai_move)
                 # print the notation for ai moves
                 print(ai_move.get_chess_notation(), end="   ")
-                set_of_move += 1
+        
                 # calling pawn promotion
                 if ai_move.is_pawn_promotion:
                     gs.board[ai_move.end_r][ai_move.end_c] = (
@@ -234,7 +234,7 @@ def main():
                     )
                 if len(gs.move_log) % 2 == 0:
                     print()
-                    set_of_move = 0
+            
                 move_made = True
 
         # if move was made then call new valid moves and set boolean to false
